@@ -47,30 +47,30 @@ $nodeCb=New-Object System.Windows.Forms.CheckBox
 $nodeCb.Text="Node.js-i d$(S '\u0259') sil (yaln$(S '\u0131')z bu installer qura$(S '\u015f')d$(S '\u0131')r$(S '\u0131')bsa)"
 $nodeCb.Checked=$false
 $nodeCb.Enabled=$nodeOwned
-$nodeCb.Location=New-Object System.Drawing.Point(35,$y+5)
+$nodeCb.Location=New-Object System.Drawing.Point(35,($y+5))
 $nodeCb.AutoSize=$true
 $form.Controls.Add($nodeCb)
 $warning=New-Object System.Windows.Forms.Label
 $warning.Text=if($nodeOwned){"Node.js bu installer t$(S '\u0259')r$(S '\u0259')find$(S '\u0259')n qura$(S '\u015f')d$(S '\u0131')r$(S '\u0131')l$(S '\u0131')b."}else{"Node.js sistemd$(S '\u0259') art$(S '\u0131')q m$(S '\u00f6')vcuddur; uninstall onu silm$(S '\u0259')y$(S '\u0259')c$(S '\u0259')k."}
-$warning.Location=New-Object System.Drawing.Point(55,$y+32)
+$warning.Location=New-Object System.Drawing.Point(55,($y+32))
 $warning.AutoSize=$true
 $form.Controls.Add($warning)
 $log=New-Object System.Windows.Forms.TextBox
 $log.Multiline=$true
 $log.ReadOnly=$true
 $log.ScrollBars="Vertical"
-$log.Location=New-Object System.Drawing.Point(30,$y+65)
+$log.Location=New-Object System.Drawing.Point(30,($y+65))
 $log.Size=New-Object System.Drawing.Size(620,120)
 $form.Controls.Add($log)
 $cancel=New-Object System.Windows.Forms.Button
 $cancel.Text="L$(S '\u0259')$(S '\u011f')v et"
-$cancel.Location=New-Object System.Drawing.Point(390,$y+200)
+$cancel.Location=New-Object System.Drawing.Point(390,($y+200))
 $cancel.Size=New-Object System.Drawing.Size(110,35)
 $cancel.Add_Click({$form.Close()})
 $form.Controls.Add($cancel)
 $clean=New-Object System.Windows.Forms.Button
 $clean.Text="T$(S '\u0259')mizl$(S '\u0259')"
-$clean.Location=New-Object System.Drawing.Point(510,$y+200)
+$clean.Location=New-Object System.Drawing.Point(510,($y+200))
 $clean.Size=New-Object System.Drawing.Size(140,35)
 $form.Controls.Add($clean)
 $clean.Add_Click({
