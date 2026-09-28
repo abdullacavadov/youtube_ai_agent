@@ -1,13 +1,17 @@
-# Demo capture specification
+# Demo çəkilişi üçün spesifikasiya
 
-Capture a real Lumen run in approximately 30–45 seconds:
+**Müəllif:** Abdulla Cavadov
 
-1. Enter: `Create a channel about forgotten American engineering projects`.
-2. Start generation and show strategy, script, narration, visuals, video, thumbnail, and SEO stages completing.
-3. Open the generated real MP4 in Review Studio.
-4. Show the factual-review and media-rights confirmations.
-5. Approve the video and show its private YouTube schedule.
+Təxminən 30–45 saniyəlik real Lumen iş prosesini göstərin:
 
-Use actual elapsed generation off camera and edit the recording for time. Do not imply that the full generation completed in 30–45 seconds. Blur credentials, OAuth data, channel IDs, and private upload details.
+1. Create a channel about forgotten American engineering projects daxil edin.
+2. İstehsalı başladın və strategiya, ssenari, narrasiya, vizuallar, video, thumbnail və SEO mərhələlərinin tamamlandığını göstərin.
+3. Yaradılmış real MP4 faylını Review Studio-da açın.
+4. Fakt yoxlaması və media hüquqları təsdiqlərini göstərin.
+5. Videonu təsdiqləyin və onun private YouTube planlamasını göstərin.
 
-The final README asset should be optimized for GitHub rendering and accompanied by a linked full-resolution video.
+Tam istehsalın 30–45 saniyəyə başa çatdığı təəssüratı yaradılmamalıdır. Real istehsal müddəti kamera xaricində aparılmalı və qeyd sonradan qısaldılmalıdır.
+
+Credential-ləri, OAuth məlumatlarını, channel ID-ləri və şəxsi upload məlumatlarını bulanıqlaşdırın.
+
+Son README asset-i GitHub-da düzgün göstərilməsi üçün optimallaşdırılmalı və tam ölçülü videoya keçidlə müşayiət olunmalıdır.
