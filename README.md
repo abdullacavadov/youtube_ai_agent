@@ -34,6 +34,20 @@ Developer olmayan istifadəçi üçün Windows quraşdırması artıq GUI ilə a
 
 Əlavə texniki məlumat: `installer/README.md`.
 
+
+## Quraşdırmanı sıfırlamaq və yenidən test etmək
+
+Testdən sonra layihəni mənbə kodunu silmədən təmizləmək üçün `installer/uninstall.bat` faylına iki dəfə klikləyin. GUI quraşdırma və runtime fayllarını seçərək silməyə imkan verir:
+
+- `node_modules`
+- `.env`
+- `config` — API açarları və tokenlər daxil olmaqla
+- `data`, `logs`, `temp`, `uploads`
+- Desktop **YouTube AI Agent** shortcut-u
+- İstəyə görə Node.js — yalnız bu installer tərəfindən quraşdırılıbsa
+
+Mənbə kodu, `package.json`, `package-lock.json` və `installer` qovluğu saxlanılır. Buna görə test dövrü sadədir: **install.bat → test → uninstall.bat → install.bat → test**.
+
 ## Sürətli başlanğıc
 
 Tələblər:
