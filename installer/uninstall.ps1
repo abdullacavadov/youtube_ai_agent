@@ -7,15 +7,36 @@ $app="YouTube AI Agent"
 
 function StopAppProcesses {
   $rootFull=$root.TrimEnd("\")
-  $procs=Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object {
-    $_.ProcessId -ne $PID -and $_.CommandLine -and (
-      $_.CommandLine -like "*$rootFull*" -or
-      $_.CommandLine -like "*youtube_ai_agent*" -or
-      $_.CommandLine -match "npm(\.cmd)?\s+start"
-    )
+  $all=Get-CimInstance Win32_Process -ErrorAction SilentlyContinue
+  $targets=@{}
+  foreach($p in $all){
+    if($p.ProcessId -eq $PID){ continue }
+    if($p.CommandLine -and (
+      $p.CommandLine -like "*$rootFull*" -or
+      $p.CommandLine -like "*youtube_ai_agent*"
+    )){
+      $targets[$p.ProcessId]=$true
+    }
   }
-  foreach($p in $procs){ try { Stop-Process -Id $p.ProcessId -Force -ErrorAction Stop } catch {} }
-  Start-Sleep -Milliseconds 800
+
+  # Stop child processes too, because native DLLs in node_modules can remain locked
+  # after npm/node itself exits.
+  $changed=$true
+  while($changed){
+    $changed=$false
+    foreach($p in $all){
+      if($targets.ContainsKey($p.ParentProcessId) -and -not $targets.ContainsKey($p.ProcessId)){
+        $targets[$p.ProcessId]=$true
+        $changed=$true
+      }
+    }
+  }
+
+  foreach($p in $all | Where-Object { $targets.ContainsKey($_.ProcessId) }){
+    try { Stop-Process -Id $p.ProcessId -Force -ErrorAction Stop } catch {}
+  }
+
+  Start-Sleep -Seconds 2
 }
 
 function RemovePath($path) { if(Test-Path -LiteralPath $path){ Remove-Item -LiteralPath $path -Recurse -Force -ErrorAction Stop } }
