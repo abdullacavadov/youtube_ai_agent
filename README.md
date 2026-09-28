@@ -21,6 +21,19 @@ YouTube kanalı üçün mövzu araşdırmasından başlayaraq ssenari, səslənd
 - **Controlled Growth Experiments:** title və thumbnail variantlarını idarə olunan eksperimentlərlə ölçmək.
 - **Outcome & ROI:** KPI, büdcə, gəlir və məlum istehsal xərclərini birlikdə izləmək.
 
+## Windows quraşdırılması
+
+Developer olmayan istifadəçi üçün Windows quraşdırması artıq GUI ilə aparılır.
+
+1. GitHub-dan layihəni ZIP kimi endirin və çıxarın.
+2. `installer/install.bat` faylına iki dəfə klikləyin.
+3. Installer Node.js 18+ tələbini yoxlayacaq və lazım gəlsə Node.js LTS quraşdırmağı təklif edəcək.
+4. AI provayderini və API key-i istəyə görə daxil edin.
+5. `npm ci`, ilkin qovluqlar, `.env` və Desktop shortcut avtomatik hazırlanacaq.
+6. Desktop-dakı **YouTube AI Agent** shortcut-u server işləyirsə birbaşa dashboard-u açır; server işləmirsə `npm start` başladır, `/health` hazır olduqdan sonra `http://localhost:3456` açılır.
+
+Əlavə texniki məlumat: `installer/README.md`.
+
 ## Sürətli başlanğıc
 
 Tələblər:
