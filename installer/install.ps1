@@ -1,55 +1,119 @@
-function S($s){[regex]::Unescape($s)}
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 $ErrorActionPreference="Stop"
 $root=(Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $app="YouTube AI Agent"
-function NodePath { $c=Get-Command node.exe -ErrorAction SilentlyContinue;if($c){return $c.Source};foreach($p in @("$env:ProgramFiles\nodejs\node.exe","$env:LOCALAPPDATA\Programs\nodejs\node.exe")){if(Test-Path $p){return $p}} }
-function EnsureNode { $n=NodePath;if($n){$m=[int]((& $n --version).TrimStart("v").Split(".")[0]);if($m -ge 18){return $n}};if([System.Windows.Forms.MessageBox]::Show("Node.js 18+ tap$(S '\u0131')lmad$(S '\u0131'). Node.js LTS qura$(S '\u015f')d$(S '\u0131')r$(S '\u0131')ls$(S '\u0131')n?",$app,"YesNo","Question") -ne "Yes"){throw "Node.js qura$(S '\u015f')d$(S '\u0131')r$(S '\u0131')lmad$(S '\u0131')."};$w=Get-Command winget.exe -ErrorAction SilentlyContinue;if(-not$w){throw "winget tap$(S '\u0131')lmad$(S '\u0131')."};Start-Process $w.Source -ArgumentList "install --id OpenJS.NodeJS.LTS -e --source winget --accept-source-agreements --accept-package-agreements --silent" -Wait -NoNewWindow;$n=NodePath;if(-not$n){throw "Node.js tap$(S '\u0131')lmad$(S '\u0131')."};Set-Content (Join-Path $root "installer\.node-installed-by-agent") "1" -Encoding ASCII;return $n }
-function StopAppProcesses { $all=Get-CimInstance Win32_Process -ErrorAction SilentlyContinue;$targets=@{};foreach($p in $all){if($p.ProcessId -ne $PID -and $p.CommandLine -and ($p.CommandLine -like "*youtube_ai_agent*" -or $p.CommandLine -like "*$root*")){$targets[$p.ProcessId]=$true}};$changed=$true;while($changed){$changed=$false;foreach($p in $all){if($targets.ContainsKey($p.ParentProcessId) -and -not$targets.ContainsKey($p.ProcessId)){$targets[$p.ProcessId]=$true;$changed=$true}}};foreach($p in $all|Where-Object{$targets.ContainsKey($_.ProcessId)}){try{Stop-Process -Id $p.ProcessId -Force -ErrorAction Stop}catch{}};Start-Sleep 2 }
-function Prep { foreach($d in @("config","logs","data","data/production","data/assets","data/videos","data/audio","data/scripts","data/captions","temp/processing","uploads/thumbnails")){New-Item -ItemType Directory -Force (Join-Path $root $d)|Out-Null};$e=Join-Path $root ".env";if(-not(Test-Path $e)){@("NODE_ENV=production","PORT=3456","LOG_LEVEL=info","DEFAULT_PRIVACY_STATUS=private","ENABLE_ANALYTICS=true","ANALYTICS_DB_PATH=./data/analytics.db","UPLOAD_PATH=./uploads","MAX_CONCURRENT_JOBS=1")|Set-Content $e -Encoding UTF8} }
-function Shortcut { $d=[Environment]::GetFolderPath("Desktop");$s=New-Object -ComObject WScript.Shell;$l=$s.CreateShortcut((Join-Path $d "$app.lnk"));$l.TargetPath="$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe";$q=[char]34;$l.Arguments="-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File $q$root\installer\launcher.ps1$q";$l.WorkingDirectory=$root;$l.Description="Start $app";$l.Save() }
-function AddLabel($parent,$text,$y) { $x=New-Object System.Windows.Forms.Label;$x.Text=$text;$x.Location=New-Object System.Drawing.Point(25,$y);$x.AutoSize=$true;$parent.Controls.Add($x) }
-function AddText($parent,$y,$password=$false) { $x=New-Object System.Windows.Forms.TextBox;$x.Location=New-Object System.Drawing.Point(25,$y);$x.Size=New-Object System.Drawing.Size(610,25);if($password){$x.UseSystemPasswordChar=$true};$parent.Controls.Add($x);return $x }
-function AddCombo($parent,$items,$y) { $x=New-Object System.Windows.Forms.ComboBox;$x.DropDownStyle="DropDownList";$x.Items.AddRange($items);$x.Location=New-Object System.Drawing.Point(25,$y);$x.Size=New-Object System.Drawing.Size(610,25);$parent.Controls.Add($x);return $x }
-$f=New-Object System.Windows.Forms.Form;$f.Text="$app - Guided Setup";$f.Size=New-Object System.Drawing.Size(760,700);$f.StartPosition="CenterScreen";$f.FormBorderStyle="Sizable";$f.MaximizeBox=$true
-$head=New-Object System.Windows.Forms.Label;$head.Text="$app $(S '\u2014') Guided Setup";$head.Font=New-Object System.Drawing.Font("Segoe UI",20,[System.Drawing.FontStyle]::Bold);$head.Location=New-Object System.Drawing.Point(25,18);$head.AutoSize=$true;$f.Controls.Add($head)
-$hint=New-Object System.Windows.Forms.Label;$hint.Text="Walkthrough-un 6 add$(S '\u0131')m$(S '\u0131') Windows GUI daxilind$(S '\u0259')."; $hint.Location=New-Object System.Drawing.Point(28,55);$hint.AutoSize=$true;$f.Controls.Add($hint)
-$tabs=New-Object System.Windows.Forms.TabControl;$tabs.Location=New-Object System.Drawing.Point(20,85);$tabs.Size=New-Object System.Drawing.Size(705,490);$f.Controls.Add($tabs)
-function NewTab($title){$p=New-Object System.Windows.Forms.TabPage;$p.Text=$title;$tabs.TabPages.Add($p)|Out-Null;return $p}
-$t1=NewTab "1. Sistem";AddLabel $t1 "Node.js 18+ v$(S '\u0259') FFmpeg yoxlanacaq, database/qovluqlar yarad$(S '\u0131')lacaq." 30
-$t2=NewTab "2. AI provider";AddLabel $t2 "AI provider $(S '\u2014') script, image v$(S '\u0259') narration." 30
-$ai=AddCombo $t2 @("Google Gemini","OpenAI","OpenRouter","Kimi (Moonshot AI)","MiMo (Xiaomi)","GLM (Zhipu AI)") 65;$ai.SelectedIndex=0
-AddLabel $t2 "API key (bo$(S '\u015f') saxlamaq olar)" 105;$aikey=AddText $t2 135 $true
-AddLabel $t2 "Model" 175;$aimodel=AddCombo $t2 @("gemini-3.7-flash","gemini-3.1-pro-preview","gemini-3.5-flash-lite","gpt-5.6","gpt-5.6-terra","gpt-5.6-luna","openai/gpt-5.6-sol","google/gemini-3.7-flash","moonshotai/kimi-k3","z-ai/glm-5.3","kimi-k3","kimi-k2.7-code","kimi-k2.6","mimo-v2.5-pro","mimo-v2.5","glm-5.3","glm-5.2","glm-5.1") 205;$aimodel.SelectedIndex=0
-$t3=NewTab "3. Video provider";AddLabel $t3 "Local slideshow default olaraq pulsuzdur." 30
-$video=AddCombo $t3 @("Local slideshow $(S '\u2014') no external video charges","ByteDance Seedance 2.5","MiniMax H3","Google Gemini Omni Flash","Kuaishou Kling 3.0 Omni","Alibaba Wan 2.7") 65;$video.SelectedIndex=0
-AddLabel $t3 "Provider API key / token" 105;$videokey=AddText $t3 135 $true;AddLabel $t3 "Kling secret key" 175;$videosecret=AddText $t3 205 $true
-$t4=NewTab "4. YouTube";AddLabel $t4 "YouTube upload $(S '\u00fc')$(S '\u00e7')$(S '\u00fc')n Google OAuth. $(S '\u0130')st$(S '\u0259')s$(S '\u0259')n skip ed$(S '\u0259') bil$(S '\u0259')rs$(S '\u0259')n." 30
-AddLabel $t4 "Client ID" 65;$client=AddText $t4 95;AddLabel $t4 "Client Secret" 135;$secret=AddText $t4 165 $true
-$auth=New-Object System.Windows.Forms.CheckBox;$auth.Text="Client m$(S '\u0259')lumatlar$(S '\u0131')ndan sonra OAuth-u ba$(S '\u015f')lat";$auth.Location=New-Object System.Drawing.Point(25,205);$auth.AutoSize=$true;$auth.Checked=$true;$t4.Controls.Add($auth)
-$cloud=New-Object System.Windows.Forms.Button;$cloud.Text="Google Cloud Console";$cloud.Location=New-Object System.Drawing.Point(25,240);$cloud.Size=New-Object System.Drawing.Size(190,30);$t4.Controls.Add($cloud);$cloud.Add_Click({Start-Process "https://console.cloud.google.com/"})
-$t5=NewTab "5. Kanal & content";AddLabel $t5 "Channel name" 30;$channel=AddText $t5 55;AddLabel $t5 "Posting frequency" 95;$frequency=AddCombo $t5 @("Daily","Every other day","3 times per week","Weekly") 120;$frequency.SelectedIndex=0
-AddLabel $t5 "Target audience" 160;$audience=AddText $t5 185;AddLabel $t5 "Default privacy" 225;$privacy=AddCombo $t5 @("private","unlisted","public") 250;$privacy.SelectedIndex=0
-AddLabel $t5 "Preferred post time" 290;$post=AddText $t5 315 180;$post.Text="14:00";AddLabel $t5 "Channel description" 350;$desc=AddText $t5 375;$desc.Text="Automated content channel"
-$t6=NewTab "6. Yekun";$review=New-Object System.Windows.Forms.TextBox;$review.Multiline=$true;$review.ReadOnly=$true;$review.ScrollBars="Vertical";$review.Location=New-Object System.Drawing.Point(25,25);$review.Size=New-Object System.Drawing.Size(630,400);$t6.Controls.Add($review)
-$back=New-Object System.Windows.Forms.Button;$back.Text="Geri";$back.Location=New-Object System.Drawing.Point(420,590);$back.Size=New-Object System.Drawing.Size(85,35);$f.Controls.Add($back)
-$next=New-Object System.Windows.Forms.Button;$next.Text="N$(S '\u00f6')vb$(S '\u0259')ti";$next.Location=New-Object System.Drawing.Point(510,590);$next.Size=New-Object System.Drawing.Size(85,35);$f.Controls.Add($next)
-$install=New-Object System.Windows.Forms.Button;$install.Text="Qura$(S '\u015f')d$(S '\u0131')r";$install.Location=New-Object System.Drawing.Point(600,590);$install.Size=New-Object System.Drawing.Size(125,35);$f.Controls.Add($install)
-$status=New-Object System.Windows.Forms.Label;$status.Text="Haz$(S '\u0131')r";$status.Location=New-Object System.Drawing.Point(25,635);$status.AutoSize=$true;$f.Controls.Add($status)
-$tabs.Add_SelectedIndexChanged({if($tabs.SelectedIndex -eq 5){$nl=[Environment]::NewLine;$review.Text="AI: "+$ai.SelectedItem+" / "+$aimodel.SelectedItem+$nl+"Video: "+$video.SelectedItem+$nl+"YouTube: "+$(if($client.Text.Trim()){"Client ID daxil edilib"}else{"Skip"})+$nl+"Channel: "+$channel.Text+$nl+"Frequency: "+$frequency.SelectedItem+$nl+"Audience: "+$audience.Text+$nl+"Privacy: "+$privacy.SelectedItem+$nl+"Post time: "+$post.Text}})
-$back.Add_Click({if($tabs.SelectedIndex -gt 0){$tabs.SelectedIndex--}});$next.Add_Click({if($tabs.SelectedIndex -lt 5){$tabs.SelectedIndex++}})
+
+function NodePath {
+  $c=Get-Command node.exe -ErrorAction SilentlyContinue
+  if($c){ return $c.Source }
+  foreach($p in @("$env:ProgramFiles\nodejs\node.exe","$env:LOCALAPPDATA\Programs\nodejs\node.exe")){
+    if(Test-Path $p){ return $p }
+  }
+}
+function EnsureNode {
+  $n=NodePath
+  if($n){
+    $m=[int]((& $n --version).TrimStart("v").Split(".")[0])
+    if($m -ge 18){ return $n }
+  }
+  $answer=[System.Windows.Forms.MessageBox]::Show("Node.js 18+ tapılmadı. Node.js LTS quraşdırılsın?",$app,"YesNo","Question")
+  if($answer -ne "Yes"){ throw "Node.js quraşdırılmadı." }
+  $w=Get-Command winget.exe -ErrorAction SilentlyContinue
+  if(-not $w){ throw "winget tapılmadı. Node.js-i manual quraşdırın və installer-i yenidən başladın." }
+  Start-Process $w.Source -ArgumentList "install --id OpenJS.NodeJS.LTS -e --source winget --accept-source-agreements --accept-package-agreements --silent" -Wait -NoNewWindow
+  $n=NodePath
+  if(-not$n){ throw "Node.js quraşdırılmadı." }
+  Set-Content (Join-Path $root "installer\.node-installed-by-agent") "1" -Encoding ASCII
+  return $n
+}
+function StopAppProcesses {
+  $rootFull=$root.TrimEnd("\")
+  $all=Get-CimInstance Win32_Process -ErrorAction SilentlyContinue
+  $targets=@{}
+  foreach($p in $all){
+    if($p.ProcessId -eq $PID){ continue }
+    if($p.CommandLine -and ($p.CommandLine -like "*$rootFull*" -or $p.CommandLine -like "*youtube_ai_agent*")){ $targets[$p.ProcessId]=$true }
+  }
+  $changed=$true
+  while($changed){
+    $changed=$false
+    foreach($p in $all){
+      if($targets.ContainsKey($p.ParentProcessId) -and -not $targets.ContainsKey($p.ProcessId)){ $targets[$p.ProcessId]=$true; $changed=$true }
+    }
+  }
+  foreach($p in $all | Where-Object { $targets.ContainsKey($_.ProcessId) }){ try { Stop-Process -Id $p.ProcessId -Force -ErrorAction Stop } catch {} }
+  Start-Sleep -Seconds 2
+}
+function CreateShortcut {
+  $desktop=[Environment]::GetFolderPath("Desktop")
+  $shortcutPath=Join-Path $desktop "$app.lnk"
+  $shell=New-Object -ComObject WScript.Shell
+  $shortcut=$shell.CreateShortcut($shortcutPath)
+  $shortcut.TargetPath="$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
+  $q=[char]34
+  $shortcut.Arguments="-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File $q$root\installer\launcher.ps1$q"
+  $shortcut.WorkingDirectory=$root
+  $shortcut.Description="Start $app"
+  $shortcut.Save()
+}
+
+$form=New-Object System.Windows.Forms.Form
+$form.Text="$app - Quraşdırma"
+$form.Size=New-Object System.Drawing.Size(620,330)
+$form.StartPosition="CenterScreen"
+$form.FormBorderStyle="FixedDialog"
+$form.MaximizeBox=$false
+$form.MinimizeBox=$false
+$title=New-Object System.Windows.Forms.Label
+$title.Text="$app"
+$title.Font=New-Object System.Drawing.Font("Segoe UI",20,[System.Drawing.FontStyle]::Bold)
+$title.Location=New-Object System.Drawing.Point(25,20)
+$title.AutoSize=$true
+$form.Controls.Add($title)
+$info=New-Object System.Windows.Forms.Label
+$info.Text="Yalnız runtime və dependency quraşdırılır."+[Environment]::NewLine+"Konfiqurasiya, credentials, database və istifadəçi məlumatlarına toxunulmur."
+$info.Location=New-Object System.Drawing.Point(28,65)
+$info.AutoSize=$true
+$form.Controls.Add($info)
+$status=New-Object System.Windows.Forms.Label
+$status.Text="Hazır"
+$status.Location=New-Object System.Drawing.Point(28,125)
+$status.AutoSize=$true
+$form.Controls.Add($status)
+$install=New-Object System.Windows.Forms.Button
+$install.Text="Quraşdır"
+$install.Location=New-Object System.Drawing.Point(380,190)
+$install.Size=New-Object System.Drawing.Size(190,40)
+$form.Controls.Add($install)
+$cancel=New-Object System.Windows.Forms.Button
+$cancel.Text="Ləğv et"
+$cancel.Location=New-Object System.Drawing.Point(270,190)
+$cancel.Size=New-Object System.Drawing.Size(95,40)
+$cancel.Add_Click({ $form.Close() })
+$form.Controls.Add($cancel)
 $install.Add_Click({
- $install.Enabled=$false
- try{
-  $status.Text="Node.js yoxlan$(S '\u0131')l$(S '\u0131')r...";$n=EnsureNode;$env:Path=(Split-Path $n -Parent)+";"+$env:Path;$npm=Get-Command npm.cmd -ErrorAction SilentlyContinue;if(-not$npm){throw "npm tap$(S '\u0131')lmad$(S '\u0131')."};StopAppProcesses;Prep
-  $status.Text="npm ci i$(S '\u015f')l$(S '\u0259')yir...";$p=Start-Process $npm.Source -ArgumentList "ci --no-audit --no-fund" -WorkingDirectory $root -Wait -PassThru -WindowStyle Hidden;if($p.ExitCode -ne 0){throw "npm ci u$(S '\u011f')ursuz oldu."}
-  $freq=@{"Daily"="daily";"Every other day"="every-2-days";"3 times per week"="3-per-week";"Weekly"="weekly"};$vmap=@{"Local slideshow $(S '\u2014') no external video charges"="slideshow";"ByteDance Seedance 2.5"="seedance";"MiniMax H3"="minimax_h3";"Google Gemini Omni Flash"="google_omni";"Kuaishou Kling 3.0 Omni"="kling";"Alibaba Wan 2.7"="wan"};$amap=@{"Google Gemini"="gemini";"OpenAI"="openai";"OpenRouter"="openrouter";"Kimi (Moonshot AI)"="kimi";"MiMo (Xiaomi)"="mimo";"GLM (Zhipu AI)"="glm"}
-  $payload=[ordered]@{aiProvider=[ordered]@{id=$amap[$ai.SelectedItem];apiKey=$aikey.Text.Trim();model=$aimodel.SelectedItem};videoProvider=[ordered]@{id=$vmap[$video.SelectedItem];key=$videokey.Text.Trim();secret=$videosecret.Text.Trim()};youtube=[ordered]@{clientId=$client.Text.Trim();clientSecret=$secret.Text.Trim();authenticate=($auth.Checked)};channel=[ordered]@{channelName=$channel.Text.Trim();frequency=$freq[$frequency.SelectedItem];targetAudience=$audience.Text.Trim();privacy=$privacy.SelectedItem;preferredPostTime=$post.Text.Trim();description=$desc.Text.Trim()}}
-  $payloadPath=Join-Path $root "temp\installer-setup.json";$payload|ConvertTo-Json -Depth 10|Set-Content $payloadPath -Encoding UTF8
-  $out=& $n (Join-Path $root "installer\setup-config.js") $payloadPath 2>&1;if($LASTEXITCODE -ne 0){throw (($out|Out-String).Trim())};Remove-Item $payloadPath -Force -ErrorAction SilentlyContinue;Shortcut;$status.Text="Tamamland$(S '\u0131')."
-  if([System.Windows.Forms.MessageBox]::Show("Walkthrough konfiqurasiyas$(S '\u0131') saxlan$(S '\u0131')ld$(S '\u0131'). Proqram indi a$(S '\u00e7')$(S '\u0131')ls$(S '\u0131')n?",$app,"YesNo","Information") -eq "Yes"){Start-Process powershell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "+[char]34+$root+"\installer\launcher.ps1"+[char]34)}
-  $f.Close()
- }catch{$status.Text="X$(S '\u0259')ta";[System.Windows.Forms.MessageBox]::Show($_.Exception.Message,"Qura$(S '\u015f')d$(S '\u0131')rma x$(S '\u0259')tas$(S '\u0131')","OK","Error")|Out-Null;$install.Enabled=$true}
+  $install.Enabled=$false; $cancel.Enabled=$false
+  try {
+    $status.Text="Node.js yoxlanılır..."
+    $n=EnsureNode
+    $env:Path=(Split-Path $n -Parent)+";"+$env:Path
+    $npm=Get-Command npm.cmd -ErrorAction SilentlyContinue
+    if(-not$npm){ throw "npm tapılmadı." }
+    $status.Text="İşləyən agent dayandırılır..."
+    StopAppProcesses
+    $status.Text="Dependency-lər quraşdırılır..."
+    $p=Start-Process $npm.Source -ArgumentList "ci --no-audit --no-fund" -WorkingDirectory $root -Wait -PassThru -WindowStyle Hidden
+    if($p.ExitCode -ne 0){ throw "npm ci uğursuz oldu. Exit code: $($p.ExitCode)" }
+    $status.Text="Desktop shortcut yaradılır..."
+    CreateShortcut
+    $status.Text="Quraşdırma tamamlandı."
+    [System.Windows.Forms.MessageBox]::Show("Quraşdırma tamamlandı."+[Environment]::NewLine+[Environment]::NewLine+"Heç bir AI/API/Google/kanal konfiqurasiyası bu mərhələdə yazılmadı."+[Environment]::NewLine+[Environment]::NewLine+"Konfiqurasiyanı proqramın Settings bölməsindən daxil edin.",$app,"OK","Information") | Out-Null
+    $form.Close()
+  } catch {
+    $status.Text="Xəta"
+    [System.Windows.Forms.MessageBox]::Show($_.Exception.Message,"Quraşdırma xətası","OK","Error") | Out-Null
+    $install.Enabled=$true; $cancel.Enabled=$true
+  }
 })
-[void]$f.ShowDialog()
+[void]$form.ShowDialog()
