@@ -1,24 +1,59 @@
 # Windows quraşdırıcı
 
-`installer\\install.bat` faylına iki dəfə klikləyin. GUI artıq CLI walkthrough-un 6 mərhələsini Windows wizard kimi təqdim edir:
+installer\\install.bat faylına iki dəfə klikləyin.
 
-1. Sistem — Node.js 18+, FFmpeg, qovluqlar və database hazırlığı
-2. AI provider — Gemini, OpenAI, OpenRouter, Kimi, MiMo və GLM; API key və model
-3. Video provider — Local slideshow, Seedance, MiniMax H3, Gemini Omni, Kling və Wan
-4. YouTube — Client ID/Secret və istəyə görə avtomatik OAuth
-5. Kanal və content — channel adı, posting frequency, target audience, privacy və post vaxtı
-6. Yekun — seçilmiş konfiqurasiyanın yoxlanması və quraşdırmanın tamamlanması
+## Install
 
-Quraşdırıcı konfiqurasiyanı layihənin mövcud `CredentialManager` və SQLite database formatına yazır. Local slideshow seçimi xarici video krediti tələb etmir.
+Installer yalnız deployment üçün lazım olan komponentləri quraşdırır:
 
-Shortcut əvvəlcə `http://localhost:3456/health` yoxlayır. Server işləyirsə dashboard birbaşa açılır. İşləmirsə arxa planda `npm start` başladılır, server hazır olduqdan sonra `http://localhost:3456` avtomatik açılır.
+1. Node.js 18+ yoxlanılır; yoxdursa istifadəçidən Node.js LTS quraşdırılması soruşulur.
+2. Agent işləyirsə dayandırılır.
+3. npm ci --no-audit --no-fund ilə dependency-lər quraşdırılır.
+4. Desktop shortcut yaradılır.
 
-## Testdən sonra təmizləmə
+**Installer heç bir tətbiq konfiqurasiyası tələb etmir və yazmır.**
 
-`installer\\uninstall.bat` faylına iki dəfə klikləyin. Açılan GUI mənbə kodunu saxlayaraq `node_modules`, `.env`, `config`, `data`, `logs`, `temp`, `uploads` və Desktop shortcut-u silir.
+Install zamanı bunlar soruşulmur və saxlanılmır:
 
-Node.js ayrıca yalnız onu bu installer quraşdırıbsa seçim kimi göstərilir. Beləliklə digər Node.js layihələrinin mühiti təsadüfən silinmir.
+- AI provider
+- AI API key və model
+- Video provider və API key
+- YouTube Client ID / Client Secret
+- OAuth
+- Channel məlumatları
+- Content settings
 
-Yenidən test üçün:
+Bu məlumatlar tətbiqin öz **Settings** bölməsindən konfiqurasiya edilməlidir.
 
-`install.bat → test → uninstall.bat → install.bat`
+Installer .env, config, data, database, credentials və digər istifadəçi məlumatlarını yaratmır və dəyişdirmir.
+
+## Uninstall
+
+installer\\uninstall.bat faylına iki dəfə klikləyin.
+
+Uninstall yalnız:
+
+- node_modules
+- Desktop-dakı YouTube AI Agent shortcut-u
+- yalnız bu installer tərəfindən quraşdırılıbsa və istifadəçi seçərsə Node.js
+
+üzərində əməliyyat aparır.
+
+Aşağıdakılara **toxunulmur**:
+
+- .env
+- config
+- data
+- logs
+- temp
+- uploads
+- database faylları
+- credentials / OAuth token-ləri
+- generated content
+- source code və layihə faylları
+
+Beləliklə uninstall → install etdikdə istifadəçi konfiqurasiyası qorunur.
+
+## Launcher
+
+Desktop shortcut installer\\launcher.ps1 faylını işə salır. Server hazırdırsa dashboard açılır; hazır deyilsə npm start arxa planda başladılır və http://localhost:3456 açılır.
