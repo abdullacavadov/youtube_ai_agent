@@ -14,6 +14,7 @@ async function main() {
   const p = payload.aiProvider;
   if (p && p.apiKey) {
     if (p.id === 'gemini') cm.credentials.gemini = { apiKey: p.apiKey, model: p.model };
+    else if (p.id === 'openai') cm.credentials.openai = { apiKey: p.apiKey, model: p.model };
     else cm.credentials.aiProvider = { provider: p.id, apiKey: p.apiKey, model: p.model };
   }
 
@@ -41,7 +42,7 @@ async function main() {
   cm.credentials.channel = {
     ...oldChannel,
     channelName: c.channelName || oldChannel.channelName || 'My Automated Channel',
-    channelDescription: oldChannel.channelDescription || 'Automated content channel',
+    channelDescription: c.description || oldChannel.channelDescription || 'Automated content channel',
     defaultCategory: oldChannel.defaultCategory || '22',
     defaultPrivacy: c.privacy || oldChannel.defaultPrivacy || 'private'
   };
@@ -51,7 +52,7 @@ async function main() {
     competitorChannels: oldContent.competitorChannels || [],
     targetAudience: c.targetAudience || oldContent.targetAudience || 'General audience interested in educational content',
     postingFrequency: c.frequency || oldContent.postingFrequency || 'daily',
-    preferredPostTime: oldContent.preferredPostTime || '14:00'
+    preferredPostTime: c.preferredPostTime || oldContent.preferredPostTime || '14:00'
   };
 
   await cm.saveCredentials();
