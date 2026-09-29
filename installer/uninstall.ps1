@@ -34,13 +34,13 @@ $form.FormBorderStyle="FixedDialog"
 $form.MaximizeBox=$false
 $form.MinimizeBox=$false
 $title=New-Object System.Windows.Forms.Label
-$title.Text="$app — Uninstall"
+$title.Text="$app  Uninstall"
 $title.Font=New-Object System.Drawing.Font("Segoe UI",20,[System.Drawing.FontStyle]::Bold)
 $title.Location=New-Object System.Drawing.Point(25,20)
 $title.AutoSize=$true
 $form.Controls.Add($title)
 $info=New-Object System.Windows.Forms.Label
-$info.Text="Yalnız installer-in quraşdırdığı dependency və shortcut silinir."+[Environment]::NewLine+"İstifadəçi konfiqurasiyası və məlumatları qorunur."
+$info.Text="Yalnz installer-in quradrd dependency v shortcut silinir."+[Environment]::NewLine+"stifadi konfiqurasiyas v mlumatlar qorunur."
 $info.Location=New-Object System.Drawing.Point(28,65)
 $info.AutoSize=$true
 $form.Controls.Add($info)
@@ -48,30 +48,30 @@ $form.Controls.Add($info)
 $nodeMarker=Join-Path $root "installer\.node-installed-by-agent"
 $nodeOwned=Test-Path $nodeMarker
 $nodeCb=New-Object System.Windows.Forms.CheckBox
-$nodeCb.Text="Node.js-i sil (yalnız bu installer quraşdırıbsa)"
+$nodeCb.Text="Node.js-i sil (yalnz bu installer quradrbsa)"
 $nodeCb.Checked=$false
 $nodeCb.Enabled=$nodeOwned
 $nodeCb.Location=New-Object System.Drawing.Point(35,125)
 $nodeCb.AutoSize=$true
 $form.Controls.Add($nodeCb)
 $nodeInfo=New-Object System.Windows.Forms.Label
-if($nodeOwned){ $nodeInfo.Text="Node.js bu installer tərəfindən quraşdırılıb." } else { $nodeInfo.Text="Node.js sistemdə mövcuddur və installer tərəfindən silinməyəcək." }
+if($nodeOwned){ $nodeInfo.Text="Node.js bu installer trfindn quradrlb." } else { $nodeInfo.Text="Node.js sistemd mvcuddur v installer trfindn silinmyck." }
 $nodeInfo.Location=New-Object System.Drawing.Point(55,150)
 $nodeInfo.AutoSize=$true
 $form.Controls.Add($nodeInfo)
 $warning=New-Object System.Windows.Forms.Label
-$warning.Text="Qorunacaq: .env, config, data, logs, temp, uploads, database, credentials və digər istifadəçi faylları."
+$warning.Text="Qorunacaq: .env, config, data, logs, temp, uploads, database, credentials v digr istifadi fayllar."
 $warning.Location=New-Object System.Drawing.Point(28,190)
 $warning.MaximumSize=New-Object System.Drawing.Size(575,0)
 $warning.AutoSize=$true
 $form.Controls.Add($warning)
 $status=New-Object System.Windows.Forms.Label
-$status.Text="Hazır"
+$status.Text="Hazr"
 $status.Location=New-Object System.Drawing.Point(28,245)
 $status.AutoSize=$true
 $form.Controls.Add($status)
 $cancel=New-Object System.Windows.Forms.Button
-$cancel.Text="Ləğv et"
+$cancel.Text="Lv et"
 $cancel.Location=New-Object System.Drawing.Point(315,285)
 $cancel.Size=New-Object System.Drawing.Size(95,40)
 $cancel.Add_Click({ $form.Close() })
@@ -85,27 +85,27 @@ $form.Controls.Add($uninstall)
 $uninstall.Add_Click({
   $uninstall.Enabled=$false; $cancel.Enabled=$false
   try {
-    $status.Text="Agent prosesləri dayandırılır..."
+    $status.Text="Agent proseslri dayandrlr..."
     StopAppProcesses
     $nodeModules=Join-Path $root "node_modules"
-    if(Test-Path $nodeModules){ $status.Text="Dependency-lər silinir..."; RemovePath $nodeModules }
+    if(Test-Path $nodeModules){ $status.Text="Dependency-lr silinir..."; RemovePath $nodeModules }
     $desktop=[Environment]::GetFolderPath("Desktop")
     $shortcut=Join-Path $desktop "$app.lnk"
     if(Test-Path $shortcut){ $status.Text="Desktop shortcut silinir..."; Remove-Item -LiteralPath $shortcut -Force -ErrorAction Stop }
     if($nodeCb.Checked -and $nodeOwned){
       $winget=Get-Command winget.exe -ErrorAction SilentlyContinue
-      if(-not$winget){ throw "Node.js silinməsi üçün winget tapılmadı." }
-      $status.Text="Installer-in quraşdırdığı Node.js silinir..."
+      if(-not$winget){ throw "Node.js silinmsi n winget taplmad." }
+      $status.Text="Installer-in quradrd Node.js silinir..."
       $p=Start-Process $winget.Source -ArgumentList "uninstall --id OpenJS.NodeJS.LTS -e --silent" -Wait -PassThru -NoNewWindow
-      if($p.ExitCode -ne 0){ throw "Node.js uninstall uğursuz oldu. Exit code: $($p.ExitCode)" }
+      if($p.ExitCode -ne 0){ throw "Node.js uninstall uursuz oldu. Exit code: $($p.ExitCode)" }
       RemovePath $nodeMarker
     }
-    $status.Text="Uninstall tamamlandı."
-    [System.Windows.Forms.MessageBox]::Show("Uninstall tamamlandı."+[Environment]::NewLine+[Environment]::NewLine+"Qorunan məlumatlar: .env, config, data, logs, temp, uploads, database və credentials.",$app,"OK","Information") | Out-Null
+    $status.Text="Uninstall tamamland."
+    [System.Windows.Forms.MessageBox]::Show("Uninstall tamamland."+[Environment]::NewLine+[Environment]::NewLine+"Qorunan mlumatlar: .env, config, data, logs, temp, uploads, database v credentials.",$app,"OK","Information") | Out-Null
     $form.Close()
   } catch {
-    $status.Text="Xəta"
-    [System.Windows.Forms.MessageBox]::Show($_.Exception.Message,"Uninstall xətası","OK","Error") | Out-Null
+    $status.Text="Xta"
+    [System.Windows.Forms.MessageBox]::Show($_.Exception.Message,"Uninstall xtas","OK","Error") | Out-Null
     $uninstall.Enabled=$true; $cancel.Enabled=$true
   }
 })
